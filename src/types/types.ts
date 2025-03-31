@@ -2,6 +2,7 @@ export interface FunctionSignature {
   name: string;
   parameters: Param[];
   returnType?: string;
+  isAsync?: boolean;
 }
 
 export interface Param {
