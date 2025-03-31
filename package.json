@@ -1,0 +1,20 @@
+{
+  "name": "context-it",
+  "version": "0.1.0",
+  "module": "index.ts",
+  "type": "module",
+  "bin": {
+    "context-it": "./src/cli/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.27.0",
+    "@babel/types": "^7.27.0",
+    "commander": "^13.1.0"
+  }
+}
