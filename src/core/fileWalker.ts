@@ -4,7 +4,7 @@
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const DEFAULT_EXTENSIONS = ['.ts', '.js', '.py', '.java', '.go'];
+const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.py', '.java', '.go'];
 
 interface WalkOptions {
   extensions?: string[];

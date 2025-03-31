@@ -3,11 +3,13 @@ export interface FunctionSignature {
   parameters: Param[];
   returnType?: string;
   isAsync?: boolean;
+  isMethod?: boolean;
 }
 
 export interface Param {
   name: string;
   type?: string;
+  isMutable?: boolean;
 }
 
 export interface LanguageProcessor {
