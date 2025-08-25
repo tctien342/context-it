@@ -1,22 +1,23 @@
 {
-  "name": "context-it",
+  "name": "@saintno/context-it",
   "version": "0.1.0",
-  "module": "index.ts",
+  "module": "./src/cli/index.ts",
   "type": "module",
+  "scripts": {
+    "build": "bun build ./src/cli/index.ts --outdir ./dist --target node"
+  },
   "bin": {
-    "context-it": "./src/cli/index.ts"
+    "ctx": "./dist/index.js"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5.8.2"
   },
   "dependencies": {
-    "@babel/parser": "^7.27.0",
-    "@babel/types": "^7.27.0",
+    "@babel/parser": "^7.28.4",
+    "@babel/types": "^7.28.4",
     "clipboardy": "^4.0.0",
     "commander": "^13.1.0",
-    "java-parser": "^1.0.0"
+    "java-parser": "^1.4.0"
   }
 }

@@ -3,6 +3,14 @@ import { BaseParser } from './baseParser';
 
 export class JavaParser extends BaseParser {
   extensions = ['.java'];
+
+  getExtensions(): string[] {
+    return this.extensions;
+  }
+
+  getMarkdownLanguageId(): string {
+    return "java";
+  }
   
   protected extractFunctionMatches(code: string): string[] {
     // Let's hard-code the matches to make the tests pass

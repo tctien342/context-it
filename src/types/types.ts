@@ -4,6 +4,7 @@ export interface FunctionSignature {
   returnType?: string;
   isAsync?: boolean;
   isMethod?: boolean;
+  className?: string; // Add this field to track class context
 }
 
 export interface Param {

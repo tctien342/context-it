@@ -3,6 +3,14 @@ import { BaseParser } from './baseParser';
 
 export class RustParser extends BaseParser {
   extensions = ['.rs'];
+
+  getExtensions(): string[] {
+    return this.extensions;
+  }
+
+  getMarkdownLanguageId(): string {
+    return "rust";
+  }
   
   public extractFunctionMatches(code: string): string[] {
     const matches: string[] = [];

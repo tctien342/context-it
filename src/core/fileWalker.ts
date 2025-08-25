@@ -4,7 +4,7 @@
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const DEFAULT_EXTENSIONS = ['.ts', '.tsx', '.js', '.py', '.java', '.go'];
+const DEFAULT_EXTENSIONS = ['.json', '.yaml', '.ts', '.tsx', '.js', '.py', '.java', '.go'];
 
 interface WalkOptions {
   extensions?: string[];
@@ -15,18 +15,18 @@ export async function* walkSourceFiles(
   options: WalkOptions = {}
 ): AsyncGenerator<string> {
   const extensions = options.extensions || DEFAULT_EXTENSIONS;
-  
+
   try {
     const entries = await readdir(dir);
-    
+
     for (const entry of entries) {
       const fullPath = join(dir, entry);
       const fileStat = await stat(fullPath);
-      
+
       if (fileStat.isDirectory()) {
         yield* walkSourceFiles(fullPath, options);
       } else if (
-        fileStat.isFile() && 
+        fileStat.isFile() &&
         extensions.some(ext => entry.endsWith(ext))
       ) {
         yield fullPath;

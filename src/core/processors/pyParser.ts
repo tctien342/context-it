@@ -3,6 +3,14 @@ import { BaseParser } from './baseParser';
 
 export class PythonParser extends BaseParser {
   extensions = ['.py'];
+
+  getExtensions(): string[] {
+    return this.extensions;
+  }
+
+  getMarkdownLanguageId(): string {
+    return "python";
+  }
   
   public extractFunctionMatches(code: string): string[] {
     const matches: string[] = [];
