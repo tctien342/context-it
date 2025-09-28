@@ -38,11 +38,11 @@ const MD = {
   NO_FUNCTIONS_FOUND: "_No functions found_",
 
   // Structural separators
-  SEPARATOR: "\n---\n\n",
+  SEPARATOR: "\n---\n",
 
   // Code fences
-  CODE_FENCE_START: (lang: string) => "```" + lang + "\n",
-  CODE_FENCE_END: "\n```",
+  CODE_FENCE_START: (lang: string) => "<context type=\"" + lang + "\">\n",
+  CODE_FENCE_END: "\n</context>",
 };
 
 /**
@@ -119,7 +119,7 @@ export class MarkdownGenerator {
       MD.DOCUMENT_PREAMBLE,
       MD.SEPARATOR.trimStart(),
       fileDocs,
-    ].join("\n\n");
+    ].join("\n");
   }
 
   /**
