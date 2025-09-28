@@ -140,7 +140,12 @@ export class TypeScriptParser extends BaseParser {
     matches: string[],
     depth: number[]
   ) {
-    const classRegex = /class\s+([A-Za-z_]\w*)(<[^>{]+>)?\s*\{/g;
+    // Accept optional generics and optional extends/implements clauses before '{'
+    // Examples matched:
+    //   export class Foo<T> extends Base implements X, Y {
+    //   class Bar {
+    const classRegex =
+      /class\s+([A-Za-z_]\w*)(?:<[^>{]+>)?(?:\s+extends\s+[^{]+?)?(?:\s+implements\s+[^{]+?)?\s*\{/g;
     let m: RegExpExecArray | null;
 
     while ((m = classRegex.exec(src)) !== null) {
@@ -186,21 +191,36 @@ export class TypeScriptParser extends BaseParser {
   ) {
     // We scan for method candidates by locating identifier + '(' with optional generics.
     // Pattern anchor at line starts to reduce false positives.
+    // Allow optional get/set prefixes that are part of TS accessor syntax.
     const methodRegex =
-      /(^|\n|\r)\s*(?:public\s+|private\s+|protected\s+|static\s+|async\s+)*([A-Za-z_]\w*)(<[^>]+>)?\s*\(/g;
+      /(^|\n|\r)\s*(?:public\s+|private\s+|protected\s+|static\s+|async\s+)*(?:get\s+|set\s+)?([A-Za-z_]\w*)(<[^>]+>)?\s*\(/g;
 
     let mm: RegExpExecArray | null;
     while ((mm = methodRegex.exec(body)) !== null) {
+      // Ensure the potential method starts at top-level within the class body (not inside another method's braces)
+      let braceDepth = 0;
+      for (let i = 0; i < mm.index; i++) {
+        const ch = body[i];
+        if (ch === "{") braceDepth++;
+        else if (ch === "}") braceDepth--;
+      }
+      if (braceDepth !== 0) continue;
+
       const prefixSegment = mm[0];
-      const fullMatchIndex = mm.index + mm[1].length; // skip leading newline captured group
       const beforeName = prefixSegment
-        .slice(0, prefixSegment.lastIndexOf(mm[2]))
+        .replace(/\s+/g, " ")
         .trim();
 
       const possibleAsync = /\basync\b/.test(beforeName);
       const methodName = mm[2];
       const generics = mm[3] || "";
-      const parenStart = methodRegex.lastIndex - 1; // position at '('
+
+      // Filter out common control-flow keywords that can appear inside bodies (defensive)
+      const banned = /^(if|for|while|switch|catch|return|else|do|try|case|default|new|throw)$/;
+      if (methodName !== "constructor" && banned.test(methodName)) continue;
+
+      // Position at '(' for this method signature
+      const parenStart = methodRegex.lastIndex - 1;
       const { content: paramGroup, end: afterParamsIndex } = this.readBalanced(
         body,
         parenStart,
@@ -210,12 +230,11 @@ export class TypeScriptParser extends BaseParser {
       if (!paramGroup) continue;
       const paramsInside = paramGroup.slice(1, -1); // drop parentheses
 
-      // After params -> optional return type
+      // After params -> optional return type (until first '{' or newline or '=>')
       let rest = body.slice(afterParamsIndex).trimStart();
       let returnType = "";
       if (rest.startsWith(":")) {
         rest = rest.slice(1).trimStart();
-        // Capture until first { or newline or =>
         const rtMatch = rest.match(/^([^={;\n]+)/);
         if (rtMatch) {
           returnType = rtMatch[1].trim();

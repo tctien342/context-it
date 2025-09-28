@@ -8,6 +8,7 @@ import { stat } from "node:fs/promises";
 import { TypeScriptParser } from "../core/processors/tsParser";
 import { GoParser } from "../core/processors/goParser";
 import { JavaParser } from "../core/processors/javaParser";
+import fs from "fs";
 import { RustParser } from "../core/processors/rustParser";
 import { PythonParser } from "../core/processors/pyParser";
 import { PhpParser } from "../core/processors/phpParser";
@@ -174,7 +175,7 @@ program
 
       // Output
       if (output) {
-        await Bun.write(output, markdown);
+        await fs.promises.writeFile(output, markdown);
         console.log(
           `${sym.ok} Wrote ${c.bold("documentation")} → ${c.cyan(output)}`
         );
@@ -202,7 +203,7 @@ program
 
       if (verbose) {
         console.log(`\n${sym.info} ${c.bold("Markdown Preview")}:\n`);
-        await Bun.write(Bun.stdout, markdown);
+        process.stdout.write(markdown);
       } else {
         console.log(
           `${sym.info} Run again with ${c.bold(

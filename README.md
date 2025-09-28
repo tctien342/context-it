@@ -1,12 +1,26 @@
 # context-it
 
-> High‑signal code context & function signature extraction for multi‑language repositories (TypeScript / JavaScript, Go, Java, Python, Rust, PHP) – powered by Bun.
+> High‑signal code context & function signature extraction for multi‑language repositories (TypeScript / JavaScript, Go, Java, Python, Rust, PHP)
 
 [![NPM Version](https://img.shields.io/npm/v/@saintno/context-it?style=flat-square)](https://www.npmjs.com/package/@saintno/context-it)
 [![License](https://img.shields.io/npm/l/@saintno/context-it?style=flat-square)](https://github.com/tctien342/context-it/blob/main/LICENSE)
 [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-donate-yellow.svg)](https://www.buymeacoffee.com/tctien342)
 
 ---
+
+## 📦 Installation
+
+Global install:
+
+```bash
+npm i -g @saintno/context-it
+```
+
+Verify:
+
+```bash
+ctx --version
+```
 
 ## ✨ What It Does
 
@@ -46,31 +60,31 @@ bun install
 Generate function signatures for current directory (copied to clipboard):
 
 ```bash
-bun run src/cli/index.ts
+ctx
 ```
 
 Generate full code + signatures for specific paths:
 
 ```bash
-bun run src/cli/index.ts ./src/core ./src/tests
+ctx ./src/core ./src/tests
 ```
 
 Output to a file:
 
 ```bash
-bun run src/cli/index.ts ./src --output CODE_CONTEXT.md
+ctx ./src --output CODE_CONTEXT.md
 ```
 
 Signatures only (no full source embedding):
 
 ```bash
-bun run src/cli/index.ts -f
+ctx -f
 ```
 
 Verbose mode (also prints the Markdown to stdout):
 
 ```bash
-bun run src/cli/index.ts -f -v ./src/core/processors
+ctx -f -v ./src/core/processors
 ```
 
 ---

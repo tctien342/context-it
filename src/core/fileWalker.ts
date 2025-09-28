@@ -3,6 +3,7 @@
  */
 import { readdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
+import fs from "fs";
 
 const DEFAULT_EXTENSIONS = ['.json', '.yaml', '.ts', '.tsx', '.js', '.py', '.java', '.go'];
 
@@ -43,8 +44,7 @@ export async function* walkSourceFiles(
  */
 export async function readSourceFile(path: string): Promise<string> {
   try {
-    const file = Bun.file(path);
-    return await file.text();
+    return await fs.promises.readFile(path, "utf8");
   } catch (error) {
     console.error(`Error reading file ${path}:`, error);
     throw error;
