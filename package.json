@@ -9,6 +9,16 @@
   "bin": {
     "ctx": "./dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tctien342/context-it.git"
+  },
+  "author": "tctien342",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tctien342/context-it/issues"
+  },
+  "homepage": "https://github.com/tctien342/context-it#readme",
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.8.2"
