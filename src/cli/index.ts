@@ -12,6 +12,7 @@ import fs from "fs";
 import { RustParser } from "../core/processors/rustParser";
 import { PythonParser } from "../core/processors/pyParser";
 import { PhpParser } from "../core/processors/phpParser";
+import { c, sym } from "../constants/log";
 
 const VERSION = "0.1.0";
 
@@ -40,30 +41,16 @@ program
   .option("-v, --verbose", "Enable verbose output", false)
   .option("-o, --output <path>", "Output file path (omit for clipboard)")
   .option("-f, --functions-only", "Extract function signatures only", false)
+  .option("--native-git", "Use native git for .gitignore detection", false)
+  .option(
+    "--no-git-ignore",
+    "Do not respect .gitignore when walking files",
+    true
+  )
   .action(async (paths, options) => {
     const start = performance.now();
-    const { input, output, functionsOnly, verbose } = options;
-
-    // Simple ANSI color helpers (no external deps)
-    const c = {
-      dim: (s: string) => `\x1b[2m${s}\x1b[0m`,
-      gray: (s: string) => `\x1b[90m${s}\x1b[0m`,
-      green: (s: string) => `\x1b[32m${s}\x1b[0m`,
-      yellow: (s: string) => `\x1b[33m${s}\x1b[0m`,
-      red: (s: string) => `\x1b[31m${s}\x1b[0m`,
-      cyan: (s: string) => `\x1b[36m${s}\x1b[0m`,
-      bold: (s: string) => `\x1b[1m${s}\x1b[0m`,
-      magenta: (s: string) => `\x1b[35m${s}\x1b[0m`,
-    };
-
-    const sym = {
-      ok: c.green("✔"),
-      warn: c.yellow("⚠"),
-      fail: c.red("✖"),
-      info: c.cyan("ℹ"),
-      dot: c.gray("•"),
-      spark: c.magenta("❯"),
-    };
+    const { input, output, functionsOnly, verbose, gitIgnore, nativeGit } =
+      options;
 
     console.log(
       `${sym.spark} ${c.bold("context-it")} ${c.dim(
@@ -114,7 +101,7 @@ program
           totalFilesScanned++;
           const parser = MarkdownGenerator.getParserForFile(basePath);
           const code = await readSourceFile(basePath);
-            const signatures = parser ? parser.extractSignatures(code) : [];
+          const signatures = parser ? parser.extractSignatures(code) : [];
           if (signatures.length > 0) {
             totalWithSignatures++;
             totalSignatures += signatures.length;
@@ -128,13 +115,16 @@ program
 
           console.log(
             `${signatures.length > 0 ? sym.ok : sym.dot} ${basePath} ${c.dim(
-              `[${signatures.length} sig${
-                signatures.length === 1 ? "" : "s"
-              }]${parser ? "" : " (no parser)"}`
+              `[${signatures.length} sig${signatures.length === 1 ? "" : "s"}]${
+                parser ? "" : " (no parser)"
+              }`
             )}`
           );
         } else if (fileStat.isDirectory()) {
-          for await (const filePath of walkSourceFiles(basePath)) {
+          for await (const filePath of walkSourceFiles(basePath, {
+            ignoreGit: gitIgnore,
+            nativeGit,
+          })) {
             totalFilesScanned++;
             const parser = MarkdownGenerator.getParserForFile(filePath);
             const code = await readSourceFile(filePath);
@@ -152,7 +142,9 @@ program
 
             if (verbose) {
               console.log(
-                `${signatures.length > 0 ? sym.ok : sym.dot} ${filePath} ${c.dim(
+                `${
+                  signatures.length > 0 ? sym.ok : sym.dot
+                } ${filePath} ${c.dim(
                   `[${signatures.length} sig${
                     signatures.length === 1 ? "" : "s"
                   }]`
@@ -187,12 +179,18 @@ program
       const ms = performance.now() - start;
       const summaryLines = [
         `${sym.info} Summary`,
-        `  ${sym.dot} Files scanned:        ${c.bold(totalFilesScanned.toString())}`,
+        `  ${sym.dot} Files scanned:        ${c.bold(
+          totalFilesScanned.toString()
+        )}`,
         `  ${sym.dot} Files w/ signatures:  ${c.bold(
           totalWithSignatures.toString()
         )}`,
-        `  ${sym.dot} Total signatures:     ${c.bold(totalSignatures.toString())}`,
-        `  ${sym.dot} Mode:                 ${functionsOnly ? "signatures-only" : "full"}`,
+        `  ${sym.dot} Total signatures:     ${c.bold(
+          totalSignatures.toString()
+        )}`,
+        `  ${sym.dot} Mode:                 ${
+          functionsOnly ? "signatures-only" : "full"
+        }`,
         `  ${sym.dot} Output:               ${
           output ? c.cyan(output) : "clipboard"
         }`,
